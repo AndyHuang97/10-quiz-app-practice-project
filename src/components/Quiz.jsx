@@ -1,7 +1,10 @@
 import { useState } from "react";
 
-import quizCompleteImg from "../assets/quiz-complete.png"
+import quizCompleteImg from "../assets/quiz-complete.png";
 import QUESTIONS from "../questions.js";
+import QuestionTimer from "./QuestionTimer.jsx";
+
+const TIMEOUT = 10000;
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
@@ -15,21 +18,27 @@ export default function Quiz() {
   }
 
   if (quisIsComplete) {
-    return <div id="summary">
-        <img src={quizCompleteImg} alt="Trophy icon"/>
+    return (
+      <div id="summary">
+        <img src={quizCompleteImg} alt="Trophy icon" />
         <h2>Quiz Completed!</h2>
-    </div>
+      </div>
+    );
   }
-  
+
   const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
   // random returns a value in [0,1]
-  // -0.5 makes the sort function return a value in [-0.5,0.5] 
+  // -0.5 makes the sort function return a value in [-0.5,0.5]
   // this means half of the pairs are swapped and half are kept in order
   shuffledAnswers.sort(() => Math.random() - 0.5);
 
   return (
     <div id="quiz">
       <div id="question">
+        <QuestionTimer
+          timeout={TIMEOUT}
+          onTimeout={() => handleSelectAnswer(nulls)}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {shuffledAnswers.map((answer) => (
