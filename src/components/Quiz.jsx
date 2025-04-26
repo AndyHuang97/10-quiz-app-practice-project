@@ -40,10 +40,15 @@ export default function Quiz() {
   // this means half of the pairs are swapped and half are kept in order
   shuffledAnswers.sort(() => Math.random() - 0.5);
 
+  // to recreate/reset the QuestionTimer we need to change the key when the question changes!
   return (
     <div id="quiz">
       <div id="question">
-        <QuestionTimer timeout={TIMEOUT} onTimeout={handleSkipAnswer} />
+        <QuestionTimer
+          key={activeQuestionIndex}
+          timeout={TIMEOUT}
+          onTimeout={handleSkipAnswer}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {shuffledAnswers.map((answer) => (
