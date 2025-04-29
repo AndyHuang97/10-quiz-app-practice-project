@@ -7,18 +7,33 @@ import QuestionTimer from "./QuestionTimer.jsx";
 const TIMEOUT = 10000;
 
 export default function Quiz() {
+  const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
   // use as little state as possible, derive as much as possible
   //const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
-  const activeQuestionIndex = userAnswers.length;
+  const activeQuestionIndex =
+    answerState === "" ? userAnswers.length : userAnswers.length - 1; // because after selecting the answer we do not go right away to next question
   const quisIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-  const handleSelectAnswer = useCallback(function handleSelectAnswer(
-    selectedAnswer
-  ) {
-    setUserAnswers((prevAnswers) => [...prevAnswers, selectedAnswer]);
-  },
-  []); // no need to add state, because React will add it for you when using setState functions
+  const handleSelectAnswer = useCallback(
+    function handleSelectAnswer(selectedAnswer) {
+      setAnswerState("answered");
+      setUserAnswers((prevAnswers) => [...prevAnswers, selectedAnswer]);
+
+      setTimeout(() => {
+        if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+          setAnswerState("correct");
+        } else {
+          setAnswerState("wrong");
+        }
+
+        setTimeout(() => {
+          setAnswerState(""); // go to next question
+        }, 2000);
+      }, 1000);
+    },
+    [activeQuestionIndex]
+  ); // no need to add state, because React will add it for you when using setState functions
 
   const handleSkipAnswer = useCallback(
     () => handleSelectAnswer(null),
@@ -51,13 +66,27 @@ export default function Quiz() {
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
-          {shuffledAnswers.map((answer) => (
-            <li key={answer} className="answer">
-              <button onClick={() => handleSelectAnswer(answer)}>
-                {answer}
-              </button>
-            </li>
-          ))}
+          {shuffledAnswers.map((answer) => {
+            const isSelected = userAnswers[userAnswers.length - 1] === answer; // add color only to selected answer
+            let cssClass = ""
+
+            if (answerState === "answered" && isSelected) {
+              cssClass = "selected"
+            }
+
+            if ((answerState === "correct" || answerState === "correct") && isSelected) {
+              cssClass = answerState
+            }
+
+
+            return (
+              <li key={answer} className="answer">
+                <button onClick={() => handleSelectAnswer(answer)} className={cssClass}>
+                  {answer}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
